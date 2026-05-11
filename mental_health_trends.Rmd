@@ -8,6 +8,7 @@ output:
     toc_float: true
     theme: flatly
     highlight: tango
+    self_contained: true
 ---
 
 ```{r setup, include=FALSE}
@@ -25,7 +26,6 @@ library(tmap)
 library(rnaturalearth)
 library(rnaturalearthdata)
 
-# FIX: Set tmap to static plot mode for reliable HTML rendering
 tmap_mode("plot")
 ```
 
@@ -65,7 +65,6 @@ package in R. Four indicators were extracted at local authority level
 ### Packages Used
 
 ```{r packages, echo=TRUE}
-# FIX: Added echo=TRUE so package list is visible in rendered document
 library(fingertipsR)
 library(tidyverse)
 library(tmap)
@@ -181,9 +180,7 @@ Confidence intervals were extremely narrow throughout, reflecting the large
 population denominator and high precision of the national estimate.
 
 ```{r trend-regression, results='hide'}
-# FIX: Variable renamed from le_trend_reg (carry-over from health inequalities
-# project) to depression_trend_reg for accuracy
-# FIX: results='hide' added — regression statistics are narrated in the text
+
 depression_trend_reg <- depression_prevalence %>%
   dplyr::filter(AreaName == "England",
                 !is.na(Value)) %>%
@@ -292,8 +289,6 @@ requiring targeted public health intervention.
 The map below shows depression prevalence across English local 
 authorities in 2024/25, revealing clear geographic patterns.
 ```{r geography-map}
-# FIX: Removed redundant library() calls — rnaturalearth, rnaturalearthdata,
-# and tmap are already loaded in the setup chunk
 
 # Get geographic boundaries - England only
 england_boundaries <- ne_states(country = "united kingdom",
@@ -428,7 +423,7 @@ ggplot(dep_depression, aes(x = deprivation_score, y = Value)) +
 ```
 
 ```{r depression-regression, results='hide'}
-# FIX: results='hide' added — regression statistics are narrated in the text
+
 dep_model <- lm(Value ~ deprivation_score, data = dep_depression)
 summary(dep_model)
 ```
@@ -890,3 +885,4 @@ Data accessed April 2026.
     François R, et al. Welcome to the tidyverse. J Open Source 
     Softw. 2019;4(43):1686.
 ```
+
