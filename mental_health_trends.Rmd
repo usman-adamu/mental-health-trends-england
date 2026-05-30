@@ -817,17 +817,17 @@ these structural determinants beyond healthcare alone.
 
 ### Data and Reproducibility
 
-All data were obtained from the OHID Fingertips platform via the 
-fingertipsR package (v1.1.0) in R. Four indicators were extracted 
-at the Counties and Unitary Authorities level (AreaTypeID 502): 
-Depression QOF prevalence (Indicator 848), depression new 
-diagnosis (Indicator 90646), percentage reporting depression or 
-anxiety (Indicator 93376), and mental health hospital admissions 
-(Indicator 90812). Deprivation data used the IMD 2019 indicator 
-(Indicator 93553). All analyses were conducted in R version 4.5.3 
-using the tidyverse, fingertipsR, tmap and sf packages. The 
-complete R Markdown source code is fully reproducible. 
-Data accessed April 2026.
+All data were obtained from the OHID Fingertips platform via the
+fingertipsR package (v1.1.0) in R, and are freely accessible
+without registration. The complete R Markdown source code for this
+analysis is publicly available on GitHub at
+https://github.com/usman-adamu/mental-health-trends-england
+and can be rendered in full by knitting the .Rmd file in RStudio
+with an active internet connection, which fetches all data live from
+the Fingertips API. No additional data files are required. All
+analysis was conducted in R version 4.4.3 using the tidyverse,
+fingertipsR, tmap, and sf packages. Data were accessed
+April 2026.
 
 
 ## References
