@@ -106,6 +106,47 @@ Unitary Authorities level (AreaTypeID 502):
 
 Data were accessed in April 2026.
 
+```{r load-data, echo = FALSE}
+depression_prevalence <- fingertips_data(
+  IndicatorID = 848,
+  AreaTypeID = 502)
+
+new_diagnosis <- fingertips_data(
+  IndicatorID = 90646,
+  AreaTypeID = 502)
+
+depression_anxiety <- fingertips_data(
+  IndicatorID = 93376,
+  AreaTypeID = 502)
+
+hospital_admissions <- fingertips_data(
+  IndicatorID = 90812,
+  AreaTypeID = 502)
+```
+
+```{r clean-data,}
+# Clean depression prevalence
+depression_clean <- depression_prevalence %>%
+  filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
+  filter(!is.na(Value)) %>%
+  select(AreaName, Timeperiod, Value, 
+         LowerCI95.0limit, UpperCI95.0limit,
+         Count, Denominator)
+
+# Clean hospital admissions
+admissions_clean <- hospital_admissions %>%
+  filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
+  filter(!is.na(Value)) %>%
+  select(AreaName, Timeperiod, Value,
+         LowerCI95.0limit, UpperCI95.0limit)
+
+# Check missing values
+cat("Missing values in depression data:", 
+    sum(is.na(depression_clean$Value)), "\n")
+cat("Missing values in admissions data:", 
+    sum(is.na(admissions_clean$Value)), "\n")
+```
+
 ### Statistical Methods
 
 The following analytical approaches were applied:
