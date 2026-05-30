@@ -32,15 +32,15 @@ tmap_mode("plot")
 ## Introduction
 
 Mental health disorders represent one of the leading causes of disability 
-and disease burden in England. Common mental health conditions including 
-depression and anxiety affect millions of people annually, with significant 
+and disease burden in England. Common mental health conditions, including 
+depression and anxiety, affect millions of people annually, with significant 
 implications for individuals, families, and the NHS.
 
 This report presents an epidemiological analysis of mental health trends 
-in England using data from the Office for Health Inequalities and Disparities 
+in England, using data from the Office for Health Inequalities and Disparities 
 (OHID) Fingertips platform. The analysis examines depression prevalence trends 
 over time, geographic variation across local authorities, and the burden of 
-mental health related hospital admissions.
+mental health-related hospital admissions.
 
 ### Research Questions
 
@@ -49,12 +49,12 @@ mental health related hospital admissions.
 3. What is the geographic distribution of depression across England?
 4. How have mental health hospital admissions changed over time?
 
-## Data and Methods
+## Methods
 
 ### Data Source
 
 Data were obtained from the OHID Fingertips platform using the fingertipsR 
-package in R. Four indicators were extracted at local authority level 
+package in R, four indicators were extracted at the local authority level 
 (Counties & Unitary Authorities from April 2023):
 
 - **Depression QOF prevalence** (Indicator 848)
@@ -62,17 +62,14 @@ package in R. Four indicators were extracted at local authority level
 - **% reporting depression or anxiety** (Indicator 93376)
 - **Mental health hospital admissions** (Indicator 90812)
 
-### Packages Used
-
-```{r packages, echo=TRUE}
+```{r packages, echo=FALSE}
 library(fingertipsR)
 library(tidyverse)
 library(tmap)
 library(sf)
 ```
 
-### Data Loading
-```{r load-data}
+```{r load-data, echo = FALSE}
 depression_prevalence <- fingertips_data(
   IndicatorID = 848,
   AreaTypeID = 502)
@@ -95,7 +92,7 @@ hospital_admissions <- fingertips_data(
 The datasets were checked for missing values and filtered to retain 
 only local authority level data, excluding aggregate regional and 
 national figures where appropriate.
-```{r clean-data}
+```{r clean-data,}
 # Clean depression prevalence
 depression_clean <- depression_prevalence %>%
   filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
@@ -134,7 +131,7 @@ england_trend <- depression_prevalence %>%
 ggplot(england_trend, aes(x = Timeperiod, y = Value, group = 1)) +
   geom_ribbon(aes(ymin = LowerCI95.0limit, ymax = UpperCI95.0limit),
               fill = "#2196F3", alpha = 0.2) +
-  # FIX: size= deprecated in ggplot2 >=3.4.0; use linewidth= for lines
+  # size= deprecated in ggplot2 >=3.4.0; use linewidth= for lines
   geom_line(colour = "#2196F3", linewidth = 1.2) +
   geom_point(colour = "#2196F3", size = 3) +
   labs(title = "Depression QOF Prevalence in England 2012-2024",
@@ -152,7 +149,7 @@ ggplot(england_trend, aes(x = Timeperiod, y = Value, group = 1)) +
 ```
 
 Depression prevalence in England increased steadily from 5.8% in 2012/13 
-to 14.3% in 2024/25 — representing a 146% increase over 12 years. This 
+to 14.3% in 2024/25, representing a 146% increase over 12 years. This 
 rising trend is consistent with national evidence showing that depression 
 prevalence has increased continuously across England since the early 2010s 
 ^1^.
@@ -162,7 +159,7 @@ drivers of this increase. Socioeconomic deprivation is one of the strongest
 predictors of depression, with evidence showing it explained up to 39% of 
 the variance in depression prevalence across English localities in 2020 
 ^1^. Social isolation and loneliness — both established 
-risk factors for depression — have increased markedly in England over the 
+risk factors for depression have increased markedly in England over the 
 past decade ^3^. The cost of living crisis has further 
 compounded these pressures, with ONS data linking financial stress directly 
 to depressive symptoms ^6^. Additionally, improved detection and 
@@ -200,7 +197,7 @@ of prevalence against time identified an average increase of
 R-squared value indicates that the trend is remarkably 
 consistent and linear over time, with time alone explaining 
 99.5% of the variance in national depression prevalence. 
-This sustained and statistically robust increase underscores 
+This sustained, and statistically robust increase underscores 
 the scale of the growing depression burden in England and 
 the urgency of population-level public health responses 
 targeting the upstream determinants of mental health.^1,2^
@@ -265,7 +262,7 @@ Considerable geographic variation in depression prevalence exists across
 English local authorities, with a clear North-South gradient apparent in 
 the data. A landmark 12-year longitudinal spatial study by Daras et al. 
 ^1^, conducted in collaboration with the University of Liverpool and 
-NIHR Applied Research Collaboration North West Coast, identified the North 
+NIHR Applied Research Collaboration North West Coast identified the North 
 West of England as having the highest concentration of depression hotspots 
 in the country, with 43% of areas in the region showing a high rate of 
 increase in prevalence between 2011 and 2022. The North East similarly 
@@ -276,10 +273,10 @@ By contrast, London had the lowest percentage of depression hotspots, with
 only 0.38% of its area falling into the highest prevalence category — a 
 pattern mirrored across much of the South East. The authors identified 
 neighbourhood socioeconomic deprivation as a key driver of this geographic 
-inequality, explaining between 3% and 39% of variance in depression 
+inequality, explaining between 3% and 39% of the variance in depression 
 prevalence across localities. These findings are consistent with wider 
-evidence that lower socioeconomic status — encompassing income, employment, 
-education and housing — is one of the strongest predictors of depression 
+evidence that lower socioeconomic status, encompassing income, employment, 
+education and housing, is one of the strongest predictors of depression 
 risk ^2^. The pattern observed in the current analysis is therefore 
 consistent with established health inequality evidence and highlights areas 
 requiring targeted public health intervention.
@@ -305,7 +302,7 @@ england_boundaries <- ne_states(country = "united kingdom",
 map_data_mh <- depression_clean %>%
   dplyr::filter(Timeperiod == "2024/25")
 
-# Fix name mismatches between boundary and Fingertips data
+# Name mismatches between boundary and Fingertips data fixed
 map_data_mh <- map_data_mh %>%
   dplyr::mutate(AreaName = dplyr::recode(AreaName,
     "Windsor and Maidenhead" = "Royal Borough of Windsor and Maidenhead",
@@ -340,11 +337,11 @@ tm_shape(england_map) +
 
 The choropleth map reveals a pronounced North-South gradient in depression 
 prevalence across English local authorities in 2024/25, with northern areas 
-consistently showing darker shading indicating higher prevalence. This 
+consistently showing darker shading, indicating higher prevalence. This 
 pattern is well-established in the literature. Daras et al. ^1^, in the 
 first nationwide longitudinal spatial analysis of depression in England, 
 identified the North West as having the highest concentration of depression 
-hotspots nationally — with 17.4% of the region's area showing persistently 
+hotspots nationally, with 17.4% of the region's area showing persistently 
 high values surrounded by similarly high neighbouring areas, and 43% of 
 areas experiencing a high rate of increase between 2011 and 2022. The North 
 East showed similar patterns, with one in three residents living in areas of 
@@ -352,7 +349,7 @@ persistently high depression prevalence ^1^.
 
 By contrast, London and the South East consistently showed the lowest 
 depression prevalence, a finding corroborated by Parliamentary analysis of 
-NHS data which identified the North of England as hosting three of the top 
+NHS data, which identified the North of England as hosting three of the top 
 five sub-regions for depression prevalence nationally ^7^. The Health 
 Foundation ^8^ similarly documented higher rates of diagnosed illness, 
 including depression, in the North of England compared to southern regions, 
@@ -360,14 +357,14 @@ linking these patterns to geographic socioeconomic inequalities and the
 Index of Multiple Deprivation.
 
 The North-South health divide in England is a long-standing and 
-well-documented phenomenon. Prior to the COVID-19 pandemic, life expectancy 
+well-documented phenomenon. Before the COVID-19 pandemic, life expectancy 
 at birth was more than two years higher in London and the South East than 
 in the North of England ^7^, with the Institute of 
 Health Equity documenting widening health inequalities in life expectancy 
 across most English regions since 2010 ^9^. 
 The depression patterns observed in the current analysis are therefore 
 consistent with broader geographic health inequalities driven by structural 
-differences in socioeconomic deprivation, employment, housing quality and 
+differences in socioeconomic deprivation, employment, housing quality, and 
 access to services.
 
 It should be noted that three local authorities (Poole, Isles of Scilly 
@@ -406,7 +403,7 @@ cat("Matched local authorities:", nrow(dep_depression), "\n")
 ```{r depression-scatter}
 ggplot(dep_depression, aes(x = deprivation_score, y = Value)) +
   geom_point(colour = "#2196F3", size = 3, alpha = 0.7) +
-  # FIX: size= deprecated for lines/smooths; use linewidth=
+  # size= deprecated for lines/smooths; use linewidth=
   geom_smooth(method = "lm", colour = "#FF5722",
               se = TRUE, linewidth = 1.2) +
   labs(title = "Deprivation Score vs Depression Prevalence",
@@ -436,9 +433,9 @@ prevalence increased by approximately 0.13 percentage points,
 confirming the expected direction of association — more deprived 
 areas have higher recorded depression prevalence.^1^
 
-However, the relatively modest R-squared value of 10.4% — 
+However, the relatively modest R-squared value of 10.4%, 
 substantially lower than the 66.7% observed for the deprivation-life 
-expectancy relationship — warrants careful interpretation. Depression 
+expectancy relationship, warrants careful interpretation. Depression 
 QOF prevalence reflects recorded diagnosis in primary care rather 
 than true population prevalence, and areas with greater GP access, 
 higher mental health literacy and better service availability may 
@@ -447,7 +444,7 @@ burden.^2^ This represents a form of ascertainment bias that may
 attenuate the observed association between deprivation and recorded 
 depression prevalence. Additionally, depression is a multifactorial 
 condition influenced by social isolation, life events, age structure, 
-employment status and service quality — factors not fully captured 
+employment status and service quality, factors not fully captured 
 by a single deprivation index.^3^ A multivariate model incorporating 
 additional predictors would likely explain a greater proportion of 
 the variance and provide a more complete account of the geographic 
@@ -483,7 +480,7 @@ ggplot(dep_depression_quintiles,
        aes(x = quintile_label, y = mean_depression,
            fill = deprivation_quintile)) +
   geom_bar(stat = "identity") +
-  # FIX: size= deprecated for error bars; use linewidth=
+  # size= deprecated for error bars; use linewidth=
   geom_errorbar(aes(ymin = mean_depression - se,
                     ymax = mean_depression + se),
                 width = 0.3, linewidth = 0.8) +
@@ -505,12 +502,12 @@ Depression prevalence showed a general positive gradient across
 deprivation quintiles, with the most deprived local authorities 
 (quintile 5) recording the highest mean depression prevalence at 
 approximately 16.8%, compared to approximately 13.0% in the least 
-deprived quintile — a difference of nearly four percentage points.^1^ 
+deprived quintile, a difference of nearly four percentage points.^1^ 
 Error bars representing standard error were consistently small across 
 quintiles, indicating low variability within groups and reliable 
 estimates.
 
-Notably, the gradient was not perfectly linear — a slight dip in 
+Notably, the gradient was not perfectly linear, a slight dip in the 
 mean prevalence was observed at quintile 3 before rising again in 
 quintiles 4 and 5. This non-linearity may reflect the known 
 ascertainment bias in QOF depression recording, whereby areas in the 
@@ -528,7 +525,7 @@ health outcomes in England.^1,3^
 
 ### 6. Mental Health Hospital Admissions Trend
 
-The chart below shows how mental health related hospital admissions 
+The chart below shows how mental health-related hospital admissions 
 have changed over time across English local authorities.
 ```{r admissions-trend}
 # England level admissions trend
@@ -540,7 +537,7 @@ admissions_trend <- hospital_admissions %>%
 
 # Plot overall trend
 ggplot(admissions_trend, aes(x = Timeperiod, y = Value, group = 1)) +
-  # FIX: size= deprecated; use linewidth=
+  # size= deprecated; use linewidth=
   geom_line(colour = "#FF5722", linewidth = 1.2) +
   geom_point(colour = "#FF5722", size = 3) +
   labs(title = "Mental Health Hospital Admissions in England",
@@ -594,7 +591,7 @@ ggplot(admissions_gender, aes(x = Timeperiod,
                                y = Value, 
                                colour = Sex,
                                group = Sex)) +
-  # FIX: size= deprecated; use linewidth=
+  # size= deprecated; use linewidth=
   geom_line(linewidth = 1.2) +
   geom_point(size = 3) +
   scale_color_manual(values = c("Male" = "#2196F3",
@@ -613,20 +610,20 @@ ggplot(admissions_gender, aes(x = Timeperiod,
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
 ```
-Female under-18s had consistently higher mental health hospital admission 
+Female under-18s had consistently higher mental health hospital admissions 
 rates than males throughout the study period. This pattern is supported by 
 national evidence: Ward et al. ^11^ found that increases in admissions 
 for mental health concerns in females aged 11–15 years were particularly 
 steep, rising by 112.8% between 2012/13 and 2021/22, with females in this 
 age group accounting for nearly one third of all admissions in 2021/22. 
-Eating disorders — which disproportionately affect young women — showed the 
+Eating disorders, which disproportionately affect young women, showed the 
 most dramatic increase, with hospital admissions rising by 514% over the 
 decade ^11^. Of the 24,300 hospital admissions for eating 
 disorders in 2020/21, the large majority involved women and girls 
 ^15^.
 
-A striking divergence emerged during 2020/21 — female admissions increased 
-sharply while male admissions declined. Solmi et al. ^12^ identified 
+A striking divergence emerged during 2020/21. Female admissions increased 
+sharply, while male admissions declined. Solmi et al. ^12^ identified 
 increased presentations for self-harm and eating disorders among girls aged 
 12–17 years in the UK in 2021, whilst presentation rates for boys in the 
 same age group showed no equivalent increase. The disproportionate mental 
@@ -712,7 +709,7 @@ pre-existing trends, particularly among adolescent girls.^12^
 
 Female under-18s had consistently higher mental health hospital 
 admission rates than males throughout the study period. During 
-2020/21 this disparity widened sharply, reflecting both the 
+2020/21, this disparity widened sharply, reflecting both the 
 disproportionate mental health burden of lockdowns on young women 
 and the structural barriers to help-seeking among young men, 
 including stigma and conformity to masculine norms.^13,16^
@@ -747,24 +744,24 @@ with appropriate caution.
 ### Recommendations
 
 **1. Targeted mental health investment in deprived areas.**
-The clear deprivation gradient — both in the regression analysis 
-and the quintile chart — confirms that universal approaches to 
+The clear deprivation gradient, both in the regression analysis 
+and the quintile chart, confirms that universal approaches to 
 depression prevention will be insufficient. Targeted investment 
 in primary care mental health services in the most deprived local 
 authorities, particularly in the North West and North East, is 
 required.^1,3^
 
 **2. Gender-responsive CAMHS services.**
-The marked and growing gender disparity in under-18 admissions — 
+The marked and growing gender disparity in under-18 admissions, 
 driven particularly by eating disorders and self-harm among 
-adolescent girls — requires dedicated service responses. NHS 
+adolescent girls require dedicated service responses. NHS 
 England's eating disorder waiting time targets have not been 
 consistently met.^11^
 
 **3. Male-friendly mental health services.**
 The decline in male admissions during the pandemic, combined with 
 evidence of structural barriers to help-seeking in young men, 
-suggests significant unmet need. Gender-sensitive service design 
+suggests a significant unmet need. Gender-sensitive service design 
 and public mental health campaigns targeting male help-seeking 
 are indicated.^13,16^
 
@@ -772,7 +769,7 @@ are indicated.^13,16^
 The absence of sex-stratified depression prevalence data in the 
 QOF indicator highlights gaps in routine surveillance. Investment 
 in nationally representative mental health prevalence surveys 
-is essential for monitoring true population burden.
+is essential for monitoring the true population burden.
 
 **5. Addressing social determinants upstream.**
 Evidence consistently identifies socioeconomic deprivation, 
@@ -784,12 +781,12 @@ these structural determinants beyond healthcare alone.
 
 All data were obtained from the OHID Fingertips platform via the 
 fingertipsR package (v1.1.0) in R. Four indicators were extracted 
-at Counties and Unitary Authorities level (AreaTypeID 502): 
+at the Counties and Unitary Authorities level (AreaTypeID 502): 
 Depression QOF prevalence (Indicator 848), depression new 
 diagnosis (Indicator 90646), percentage reporting depression or 
 anxiety (Indicator 93376), and mental health hospital admissions 
 (Indicator 90812). Deprivation data used the IMD 2019 indicator 
-(Indicator 93553). All analysis was conducted in R version 4.5.3 
+(Indicator 93553). All analyses were conducted in R version 4.5.3 
 using the tidyverse, fingertipsR, tmap and sf packages. The 
 complete R Markdown source code is fully reproducible. 
 Data accessed April 2026.
