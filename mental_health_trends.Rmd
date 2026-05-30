@@ -51,69 +51,107 @@ mental health-related hospital admissions.
 
 ## Methods
 
+### Study Design
+
+This was a population-based ecological study examining mental health
+trends across local authorities in England. Ecological analyses use
+area-level aggregate data to describe population patterns and examine
+associations between area-level exposures and outcomes. All analyses
+were conducted at the level of Counties and Unitary Authorities, the
+primary administrative geography for public health reporting in England.
+Findings describe associations at the area level and cannot be used to
+infer causal relationships at the individual level.
+
+### Setting and Study Population
+
+The analysis covers all Counties and Unitary Authorities in England
+(n = 151 areas, AreaTypeID 502) over the period 2010/11 to 2024/25.
+The depression prevalence indicator covers the registered adult
+population aged 18 and over in general practice. The mental health
+hospital admissions indicator covers individuals aged under 18 years.
+Deprivation data were derived from the Index of Multiple Deprivation
+2019 (IMD 2019), the standard measure of relative area-level
+deprivation in England, which incorporates seven weighted domains:
+income, employment, education, health, crime, barriers to housing, and
+services, and living environment.^10^
+
 ### Data Source
 
-Data were obtained from the OHID Fingertips platform using the fingertipsR 
-package in R, four indicators were extracted at the local authority level 
-(Counties & Unitary Authorities from April 2023):
+All data were obtained from the Office for Health Inequalities and
+Disparities (OHID) Fingertips platform, the national repository for
+public health indicators in England, using the `fingertipsR` package
+(v1.1.0) in R.^18^ Five indicators were extracted at the counties and
+Unitary Authorities level (AreaTypeID 502):
 
-- **Depression QOF prevalence** (Indicator 848)
-- **Depression new diagnosis** (Indicator 90646)
-- **% reporting depression or anxiety** (Indicator 93376)
-- **Mental health hospital admissions** (Indicator 90812)
+- **Depression QOF prevalence** (Indicator 848): the percentage of
+  registered patients aged 18 and over with a recorded diagnosis of
+  depression on the Quality and Outcomes Framework (QOF) disease
+  register. This reflects recorded diagnosis in primary care rather
+  than true population prevalence and is subject to ascertainment
+  bias related to GP access, mental health literacy, and
+  service availability.^2^
+- **Depression new diagnosis rate** (Indicator 90646): the rate of
+  new depression diagnoses recorded in primary care per 100,000
+  registered patients.
+- **Percentage reporting depression or anxiety** (Indicator 93376):
+  the percentage of respondents reporting depression or anxiety,
+  derived from patient survey data.
+- **Mental health hospital admissions among under-18s**
+  (Indicator 90812): the directly standardised rate of emergency
+  hospital admissions for mental health conditions per 100,000
+  population aged under 18 years.
+- **IMD 2019 deprivation score** (Indicator 93553): the composite
+  area-level deprivation score derived from the Index of Multiple
+  Deprivation 2019, where higher scores indicate greater deprivation.
 
-```{r packages, echo=FALSE}
-library(fingertipsR)
-library(tidyverse)
-library(tmap)
-library(sf)
-```
+Data were accessed in April 2026.
 
-```{r load-data, echo = FALSE}
-depression_prevalence <- fingertips_data(
-  IndicatorID = 848,
-  AreaTypeID = 502)
+### Statistical Methods
 
-new_diagnosis <- fingertips_data(
-  IndicatorID = 90646,
-  AreaTypeID = 502)
+The following analytical approaches were applied:
 
-depression_anxiety <- fingertips_data(
-  IndicatorID = 93376,
-  AreaTypeID = 502)
+**Trend analysis.** National England-level depression QOF prevalence
+was plotted over time with 95% confidence intervals. A linear
+regression model was fitted with prevalence as the outcome and a
+sequential time index as the predictor to formally test and quantify
+the direction and magnitude of the trend (β coefficient, p-value,
+and R²).^1^
 
-hospital_admissions <- fingertips_data(
-  IndicatorID = 90812,
-  AreaTypeID = 502)
-```
+**Geographic analysis.** A choropleth map was produced displaying
+depression QOF prevalence by the local authority for the most recent
+available data year (2024/25), using boundary data from the
+`rnaturalearth` package and visualised with `tmap`. Local authorities
+with the ten highest and ten lowest depression prevalence values were
+identified and plotted separately.
 
-### Data Cleaning
+**Deprivation analysis.** The cross-sectional association between
+IMD 2019 deprivation score and depression prevalence in 2024/25
+was examined using a scatter plot with linear regression fit,
+reporting β, p-value and R². Local authorities were additionally
+stratified into deprivation quintiles using the `ntile()` function
+in R, and mean depression prevalence with standard error was plotted
+across quintiles to characterise the social gradient.
 
-The datasets were checked for missing values and filtered to retain 
-only local authority level data, excluding aggregate regional and 
-national figures where appropriate.
-```{r clean-data,}
-# Clean depression prevalence
-depression_clean <- depression_prevalence %>%
-  filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
-  filter(!is.na(Value)) %>%
-  select(AreaName, Timeperiod, Value, 
-         LowerCI95.0limit, UpperCI95.0limit,
-         Count, Denominator)
+**Hospital admissions analysis.** Time-series plots of mental health
+hospital admission rates among under-18s were produced for England
+overall and stratified by sex (male and female), to examine temporal
+trends and gender disparities.
 
-# Clean hospital admissions
-admissions_clean <- hospital_admissions %>%
-  filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
-  filter(!is.na(Value)) %>%
-  select(AreaName, Timeperiod, Value,
-         LowerCI95.0limit, UpperCI95.0limit)
+All statistical analyses were conducted in R version 4.5.3 using
+the `tidyverse`, `fingertipsR`, `tmap`, and `sf` packages.^18^
+A p-value threshold of 0.05 was used to define statistical
+significance throughout.
 
-# Check missing values
-cat("Missing values in depression data:", 
-    sum(is.na(depression_clean$Value)), "\n")
-cat("Missing values in admissions data:", 
-    sum(is.na(admissions_clean$Value)), "\n")
-```
+### Ethical Considerations
+
+This study used only routinely collected, publicly available,
+and fully anonymised population-level data obtained from the OHID
+Fingertips platform. No individual-level data were accessed at any
+stage of the analysis. In accordance with Health Research Authority
+guidance, studies using only anonymised publicly available data do
+not require NHS Research Ethics Committee approval. No ethical
+approval was therefore sought or required for this analysis.
+
 
 ## Results
 
@@ -158,8 +196,8 @@ Multiple intersecting factors have been identified in the literature as
 drivers of this increase. Socioeconomic deprivation is one of the strongest 
 predictors of depression, with evidence showing it explained up to 39% of 
 the variance in depression prevalence across English localities in 2020 
-^1^. Social isolation and loneliness — both established 
-risk factors for depression have increased markedly in England over the 
+^1^. Social isolation and loneliness, both established 
+risk factors for depression, have increased markedly in England over the 
 past decade ^3^. The cost of living crisis has further 
 compounded these pressures, with ONS data linking financial stress directly 
 to depressive symptoms ^6^. Additionally, improved detection and 
@@ -270,7 +308,7 @@ showed persistently high rates, with one in three residents living in areas
 marked by sustained high depression prevalence ^1^.
 
 By contrast, London had the lowest percentage of depression hotspots, with 
-only 0.38% of its area falling into the highest prevalence category — a 
+only 0.38% of its area falling into the highest prevalence category, a 
 pattern mirrored across much of the South East. The authors identified 
 neighbourhood socioeconomic deprivation as a key driver of this geographic 
 inequality, explaining between 3% and 39% of the variance in depression 
@@ -560,7 +598,7 @@ substantially over the study period, rising from approximately 85 per
 national cohort study by Ward et al. ^11^, published in *The Lancet Child 
 & Adolescent Health*, found that admissions for mental health concerns among 
 children aged 5–18 years in England increased by 65% between 2012/13 and 
-2021/22 — a rise substantially greater than the 10% increase in all-cause 
+2021/22, a rise substantially greater than the 10% increase in all-cause 
 admissions over the same period. Self-harm accounted for 53% of all mental 
 health admissions in 2021/22, while eating disorders showed a striking 
 514% increase over the decade ^11^.
@@ -642,10 +680,37 @@ emotional stoicism led young men to perceive seeking help as a threat to
 their masculinity, reducing engagement with mental health services. Smith 
 et al. ^14^ further identified denial of symptoms, poor rapport with 
 healthcare professionals, and lower mental health literacy as additional 
-barriers specific to men. The "gender paradox in suicide" — where men have 
+barriers specific to men. The "gender paradox in suicide", where men have 
 higher suicide rates despite women having higher rates of self-harm and 
-help-seeking — underscores the clinical significance of these barriers 
+help-seeking, underscores the clinical significance of these barriers 
 ^16^. Both trends warrant urgent policy attention.
+
+### Limitations
+
+Several methodological limitations should be acknowledged.
+
+First, QOF depression prevalence reflects recorded diagnosis in 
+primary care rather than true population prevalence. The modest 
+R-squared value in the deprivation-depression regression 
+(R² = 0.10) is consistent with this ascertainment bias, areas 
+with better GP access may record more depression independently 
+of true burden.^2^
+
+Second, the depression prevalence indicator contains only a 
+"Persons" sex category with no Male/Female breakdown, preventing 
+sex-stratified analysis of prevalence trends. This is a limitation 
+of the indicator design rather than the analytical approach.
+
+Third, the hospital admissions indicator is specific to under-18s 
+and does not capture adult admission trends, which may follow 
+different patterns.
+
+Fourth, this is an ecological analysis. Area-level associations 
+cannot be used to infer individual-level causal relationships.
+
+Fifth, the most recent data point (2024/25) for the national 
+depression trend is a modelled estimate and should be interpreted 
+with appropriate caution.
 
 ## Conclusion
 
@@ -681,7 +746,7 @@ Linear regression confirmed a statistically significant positive
 association between deprivation score and depression prevalence 
 across English local authorities (β = 0.13, p < 0.001, R² = 0.10). 
 The deprivation quintile analysis further demonstrated a clear 
-social gradient — local authorities in the most deprived quintile 
+social gradient, local authorities in the most deprived quintile 
 recorded mean depression prevalence of approximately 16.8% compared 
 to 13.0% in the least deprived quintile. The modest R-squared value 
 reflects the known ascertainment bias in QOF recording and the 
@@ -713,33 +778,6 @@ admission rates than males throughout the study period. During
 disproportionate mental health burden of lockdowns on young women 
 and the structural barriers to help-seeking among young men, 
 including stigma and conformity to masculine norms.^13,16^
-
-### Limitations
-
-Several methodological limitations should be acknowledged.
-
-First, QOF depression prevalence reflects recorded diagnosis in 
-primary care rather than true population prevalence. The modest 
-R-squared value in the deprivation-depression regression 
-(R² = 0.10) is consistent with this ascertainment bias — areas 
-with better GP access may record more depression independently 
-of true burden.^2^
-
-Second, the depression prevalence indicator contains only a 
-"Persons" sex category with no Male/Female breakdown, preventing 
-sex-stratified analysis of prevalence trends. This is a limitation 
-of the indicator design rather than the analytical approach.
-
-Third, the hospital admissions indicator is specific to under-18s 
-and does not capture adult admission trends, which may follow 
-different patterns.
-
-Fourth, this is an ecological analysis. Area-level associations 
-cannot be used to infer individual-level causal relationships.
-
-Fifth, the most recent data point (2024/25) for the national 
-depression trend is a modelled estimate and should be interpreted 
-with appropriate caution.
 
 ### Recommendations
 
