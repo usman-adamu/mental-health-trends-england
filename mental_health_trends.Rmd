@@ -124,7 +124,7 @@ hospital_admissions <- fingertips_data(
   AreaTypeID = 502)
 ```
 
-```{r clean-data,}
+```{r clean-data, echo = FALSE, include = FALSE}
 # Clean depression prevalence
 depression_clean <- depression_prevalence %>%
   filter(AreaType == "Counties & UAs (from Apr 2023)") %>%
@@ -458,7 +458,7 @@ The scatter plot below examines the relationship between
 neighbourhood deprivation and depression prevalence across 
 English local authorities in 2024/25.
 
-```{r depression-deprivation}
+```{r depression-deprivation, echo = FALSE, include = FALSE}
 # Get depression data for latest year
 depression_dep <- depression_clean %>%
   dplyr::filter(Timeperiod == "2024/25")
